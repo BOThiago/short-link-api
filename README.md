@@ -28,6 +28,11 @@ Backend API para serviço de encurtamento de URLs construído com NestJS.
 ## 📦 Instalação
 
 ```bash
+#Clone os projetos
+git clone --recurse-submodules --remote-submodules git@github.com:BOThiago/short-link-api.git
+```
+
+```bash
 # Instalar dependências
 npm install
 

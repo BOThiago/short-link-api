@@ -69,5 +69,4 @@ Thumbs.db
 *.db
 
 # Frontend submodule (will be added separately)
-short-link-ui/
 frontend/

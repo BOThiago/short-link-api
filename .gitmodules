@@ -1,0 +1,3 @@
+[submodule "short-link-ui"]
+	path = short-link-ui
+	url = https://github.com/BOThiago/short-link-ui.git

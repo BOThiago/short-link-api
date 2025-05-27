@@ -1,0 +1,116 @@
+services:
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: shortlink-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: shortlink
+      MYSQL_USER: shortlink
+      MYSQL_PASSWORD: password
+    ports:
+      - '3306:3306'
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - shortlink-network
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
+      timeout: 20s
+      retries: 10
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: shortlink-redis
+    restart: unless-stopped
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_data:/data
+    networks:
+      - shortlink-network
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      timeout: 20s
+      retries: 10
+
+  # NestJS API
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: shortlink-api
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    environment:
+      # Database Configuration
+      DATABASE_HOST: mysql
+      DATABASE_PORT: 3306
+      DATABASE_USER: shortlink
+      DATABASE_PASSWORD: password
+      DATABASE_NAME: shortlink
+
+      # Redis Configuration
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ''
+
+      # Application Configuration
+      PORT: 3000
+      NODE_ENV: production
+      BASE_URL: http://localhost:3000
+
+      # URL Expiration (in minutes)
+      URL_EXPIRATION_MINUTES: 60
+
+      # Rate Limiting
+      RATE_LIMIT_TTL: 60
+      RATE_LIMIT_LIMIT: 10
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - shortlink-network
+    volumes:
+      - ./public:/usr/src/app/public
+
+  # Next.js Frontend
+  frontend:
+    build:
+      context: ./short-link-ui
+      dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_API_URL=/api
+        - BACKEND_URL=http://api:3000
+    container_name: shortlink-frontend
+    restart: unless-stopped
+    ports:
+      - '3001:3001'
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      HOSTNAME: '0.0.0.0'
+      # API Configuration
+      NEXT_PUBLIC_API_URL: '/api'
+      BACKEND_URL: 'http://api:3000'
+      NEXT_TELEMETRY_DISABLED: 1
+    depends_on:
+      - api
+    networks:
+      - shortlink-network
+
+volumes:
+  mysql_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  shortlink-network:
+    driver: bridge

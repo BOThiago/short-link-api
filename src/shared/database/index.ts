@@ -15,7 +15,14 @@ export const createDatabase = (config: {
   password: string;
   database: string;
 }) => {
-  const pool = createPool({
+  console.log('🔗 Connecting to database:', {
+    host: config.host,
+    port: config.port,
+    user: config.user,
+    database: config.database,
+  });
+
+  const poolConfig: any = {
     host: config.host,
     port: config.port,
     user: config.user,
@@ -23,7 +30,35 @@ export const createDatabase = (config: {
     database: config.database,
     multipleStatements: true,
     connectionLimit: 10,
-  });
+    acquireTimeout: 60000,
+    timeout: 60000,
+    reconnect: true,
+    idleTimeout: 300000,
+  };
+
+  if (process.env.NODE_ENV === 'production') {
+    poolConfig.ssl = {
+      rejectUnauthorized: false,
+    };
+  }
+
+  const pool = createPool(poolConfig);
+
+  pool
+    .getConnection()
+    .then((connection) => {
+      console.log('✅ Database connected successfully');
+      connection.release();
+    })
+    .catch((error) => {
+      console.error('❌ Database connection failed:', error.message);
+      console.error('Connection config:', {
+        host: config.host,
+        port: config.port,
+        user: config.user,
+        database: config.database,
+      });
+    });
 
   return drizzle(pool, { schema, mode: 'default' });
 };

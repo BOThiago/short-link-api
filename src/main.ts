@@ -14,9 +14,12 @@ async function bootstrap() {
       'http://127.0.0.1:3001',
       'http://127.0.0.1:3000',
       'https://short-link-c6tfh4vai-bothiagos-projects.vercel.app',
+      'https://short-link-c6tfh4vai-bothiagos-projects.vercel.app/',
+      /^https:\/\/.*\.vercel\.app$/,
     ],
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    credentials: true,
   });
 
   // Global validation pipe

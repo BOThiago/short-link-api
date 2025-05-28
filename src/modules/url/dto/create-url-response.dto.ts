@@ -27,7 +27,7 @@ export class CreateUrlResponseDto {
 
   @ApiProperty({
     description: 'Complete shortened URL ready to use',
-    example: 'http://localhost:3000/r/abc123',
+    example: 'localhost:3000/abc123',
     format: 'url',
   })
   shortUrl: string;

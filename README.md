@@ -75,7 +75,7 @@ FRONTEND_URL=http://localhost:3001
 
 ## 📚 API Documentation
 
-A documentação da API está disponível em `/api/docs` quando o servidor estiver rodando.
+A documentação da API está disponível em `/api-docs` quando o servidor estiver rodando.
 
 ## 🧪 Testes
 

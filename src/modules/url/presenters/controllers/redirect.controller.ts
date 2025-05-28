@@ -11,7 +11,7 @@ import { UrlService } from '../../url.service';
 import { NotFoundErrorResponseDto } from '../../dto';
 
 @ApiTags('Redirect')
-@Controller('r')
+@Controller()
 export class RedirectController {
   constructor(private readonly urlService: UrlService) {}
 

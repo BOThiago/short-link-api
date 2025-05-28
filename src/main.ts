@@ -1,5 +1,5 @@
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, RequestMethod } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 
@@ -31,9 +31,6 @@ async function bootstrap() {
     }),
   );
 
-  // API prefix for most routes
-  app.setGlobalPrefix('api');
-
   // Swagger documentation
   const config = new DocumentBuilder()
     .setTitle('Short Link API')
@@ -49,9 +46,9 @@ async function bootstrap() {
       - 🏥 Health checks para deployment
       
       ## Como usar:
-      1. **Criar URL curta**: POST /api/url
-      2. **Acessar URL**: GET /r/{shortCode}
-      3. **Ver relatórios**: GET /api/reports/*
+      1. **Criar URL curta**: POST /url
+      2. **Acessar URL**: GET /{shortCode}
+      3. **Ver relatórios**: GET /reports/*
       4. **Monitoramento**: GET /metrics
     `,
     )
@@ -99,8 +96,8 @@ async function bootstrap() {
   console.log(`🚀 API running on: http://localhost:${port}`);
   console.log(`📚 API Documentation: http://localhost:${port}/api-docs`);
   console.log(`🌐 Frontend: http://localhost:3001`);
-  console.log(`📊 Metrics: http://localhost:${port}/api/metrics`);
-  console.log(`🏥 Health Check: http://localhost:${port}/api/health`);
+  console.log(`📊 Metrics: http://localhost:${port}/metrics`);
+  console.log(`🏥 Health Check: http://localhost:${port}/health`);
 }
 
 bootstrap();

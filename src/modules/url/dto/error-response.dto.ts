@@ -29,7 +29,7 @@ export class ErrorResponseDto {
 
   @ApiProperty({
     description: 'Request path where the error occurred',
-    example: '/api/url',
+    example: '/url',
   })
   path: string;
 }

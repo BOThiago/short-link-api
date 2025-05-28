@@ -86,8 +86,9 @@ services:
       context: ./short-link-ui
       dockerfile: Dockerfile
       args:
-        - NEXT_PUBLIC_API_URL=/api
-        - BACKEND_URL=http://api:3000
+        - NEXT_PUBLIC_API_URL=http://localhost:3000
+        - BACKEND_URL=http://localhost:3000
+        - BASE_DOMAIN=localhost:3000
     container_name: shortlink-frontend
     restart: unless-stopped
     ports:
@@ -96,9 +97,9 @@ services:
       NODE_ENV: production
       PORT: 3001
       HOSTNAME: '0.0.0.0'
+      BASE_DOMAIN: 'localhost:3000'
       # API Configuration
-      NEXT_PUBLIC_API_URL: '/api'
-      BACKEND_URL: 'http://api:3000'
+      BACKEND_URL: 'http://localhost:3000'
       NEXT_TELEMETRY_DISABLED: 1
     depends_on:
       - api

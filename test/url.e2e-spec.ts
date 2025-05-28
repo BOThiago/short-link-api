@@ -13,7 +13,7 @@ describe('URL Controller (e2e)', () => {
 
   const mockUrl = {
     id: 1,
-    shortCode: 'abc123',
+    shortCode: 'abc12345',
     originalUrl:
       'https://www.example.com/very-long-url-that-needs-to-be-shortened',
     accessCount: 0,
@@ -65,7 +65,6 @@ describe('URL Controller (e2e)', () => {
       }),
     );
 
-    app.setGlobalPrefix('api');
     await app.init();
   });
 
@@ -92,7 +91,7 @@ describe('URL Controller (e2e)', () => {
     });
   });
 
-  describe('/api/url (POST)', () => {
+  describe('/url (POST)', () => {
     it('should create a short URL successfully', async () => {
       const createUrlDto = {
         originalUrl:
@@ -100,7 +99,7 @@ describe('URL Controller (e2e)', () => {
       };
 
       const response = await request(app.getHttpServer())
-        .post('/api/url')
+        .post('/url')
         .send(createUrlDto)
         .expect(201);
 
@@ -108,13 +107,13 @@ describe('URL Controller (e2e)', () => {
         id: expect.any(Number),
         shortCode: expect.any(String),
         originalUrl: createUrlDto.originalUrl,
-        shortUrl: expect.stringContaining('http'),
+        shortUrl: expect.stringMatching(/^[^\/]+\/[a-zA-Z0-9_-]+$/),
         expiresAt: expect.any(String),
         accessCount: expect.any(Number),
         createdAt: expect.any(String),
       });
 
-      expect(response.body.shortCode).toHaveLength(6);
+      expect(response.body.shortCode).toHaveLength(8);
 
       expect(urlRepository.countByCreatorIp).toHaveBeenCalled();
       expect(urlRepository.create).toHaveBeenCalled();
@@ -126,7 +125,7 @@ describe('URL Controller (e2e)', () => {
       };
 
       const response = await request(app.getHttpServer())
-        .post('/api/url')
+        .post('/url')
         .send(invalidUrlDto)
         .expect(400);
 
@@ -145,7 +144,7 @@ describe('URL Controller (e2e)', () => {
       };
 
       const response = await request(app.getHttpServer())
-        .post('/api/url')
+        .post('/url')
         .send(emptyUrlDto)
         .expect(400);
 
@@ -164,7 +163,7 @@ describe('URL Controller (e2e)', () => {
       };
 
       const response = await request(app.getHttpServer())
-        .post('/api/url')
+        .post('/url')
         .send(longUrlDto)
         .expect(400);
 
@@ -184,7 +183,7 @@ describe('URL Controller (e2e)', () => {
       };
 
       const response = await request(app.getHttpServer())
-        .post('/api/url')
+        .post('/url')
         .send(invalidDto)
         .expect(400);
 
@@ -205,7 +204,7 @@ describe('URL Controller (e2e)', () => {
       };
 
       const response = await request(app.getHttpServer())
-        .post('/api/url')
+        .post('/url')
         .send(createUrlDto)
         .expect(403);
 
@@ -221,16 +220,16 @@ describe('URL Controller (e2e)', () => {
       };
 
       urlRepository.create
-        .mockResolvedValueOnce({ ...mockUrl, shortCode: 'abc123' })
-        .mockResolvedValueOnce({ ...mockUrl, shortCode: 'def456' });
+        .mockResolvedValueOnce({ ...mockUrl, shortCode: 'abc12345' })
+        .mockResolvedValueOnce({ ...mockUrl, shortCode: 'def67890' });
 
       const response1 = await request(app.getHttpServer())
-        .post('/api/url')
+        .post('/url')
         .send(createUrlDto)
         .expect(201);
 
       const response2 = await request(app.getHttpServer())
-        .post('/api/url')
+        .post('/url')
         .send(createUrlDto)
         .expect(201);
 
@@ -239,10 +238,10 @@ describe('URL Controller (e2e)', () => {
     });
   });
 
-  describe('/api/url (GET)', () => {
+  describe('/url (GET)', () => {
     it('should return paginated list of URLs', async () => {
       const response = await request(app.getHttpServer())
-        .get('/api/url')
+        .get('/url')
         .query({ page: 1, limit: 10 })
         .expect(200);
 
@@ -274,7 +273,7 @@ describe('URL Controller (e2e)', () => {
       urlRepository.findAllPaginated.mockResolvedValue([[mockUrl], 1]);
 
       const response = await request(app.getHttpServer())
-        .get('/api/url')
+        .get('/url')
         .query({ page: 1, limit: 2 })
         .expect(200);
 
@@ -284,7 +283,7 @@ describe('URL Controller (e2e)', () => {
 
     it('should validate pagination parameters', async () => {
       const response = await request(app.getHttpServer())
-        .get('/api/url')
+        .get('/url')
         .query({ page: 0, limit: -1 })
         .expect(400);
 
@@ -298,11 +297,11 @@ describe('URL Controller (e2e)', () => {
   describe('URL Redirection', () => {
     it('should redirect to original URL', async () => {
       const response = await request(app.getHttpServer())
-        .get('/api/r/abc123')
+        .get('/abc12345')
         .expect(302);
 
       expect(response.headers.location).toBe(mockUrl.originalUrl);
-      expect(urlRepository.findByShortCode).toHaveBeenCalledWith('abc123');
+      expect(urlRepository.findByShortCode).toHaveBeenCalledWith('abc12345');
       expect(urlRepository.incrementAccessCount).toHaveBeenCalledWith(
         mockUrl.id,
       );
@@ -313,7 +312,7 @@ describe('URL Controller (e2e)', () => {
       urlRepository.findByShortCode.mockResolvedValue(null);
 
       const response = await request(app.getHttpServer())
-        .get('/api/r/nonexistent')
+        .get('/nonexistent')
         .expect(404);
 
       expect(response.body).toMatchObject({
@@ -324,7 +323,7 @@ describe('URL Controller (e2e)', () => {
     });
 
     it('should track access statistics', async () => {
-      await request(app.getHttpServer()).get('/api/r/abc123').expect(302);
+      await request(app.getHttpServer()).get('/abc12345').expect(302);
 
       expect(urlRepository.incrementAccessCount).toHaveBeenCalledWith(
         mockUrl.id,

@@ -31,7 +31,7 @@ export class UrlPresenter {
       id: url.id,
       shortCode: url.shortCode,
       originalUrl: url.originalUrl,
-      shortUrl: `${process.env.BASE_DOMAIN || 'localhost:3000'}/${url.shortCode}`,
+      shortUrl: `${process.env.BASE_URL || 'localhost:3000'}/${url.shortCode}`,
       expiresAt: url.expiresAt,
       accessCount: url.accessCount,
       createdAt: url.createdAt,
@@ -43,7 +43,7 @@ export class UrlPresenter {
       id: url.id,
       shortCode: url.shortCode,
       originalUrl: url.originalUrl,
-      shortUrl: `${process.env.BASE_DOMAIN || 'localhost:3000'}/${url.shortCode}`,
+      shortUrl: `${process.env.BASE_URL || 'localhost:3000'}/${url.shortCode}`,
       expiresAt: url.expiresAt,
       accessCount: url.accessCount,
       createdAt: url.createdAt,
@@ -78,6 +78,6 @@ export class UrlPresenter {
   }
 
   static formatShortUrl(shortCode: string, baseUrl: string): string {
-    return `${process.env.BASE_DOMAIN || 'localhost:3000'}/${shortCode}`;
+    return `${process.env.BASE_URL || 'localhost:3000'}/${shortCode}`;
   }
 }

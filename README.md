@@ -29,7 +29,7 @@ Backend API para serviço de encurtamento de URLs construído com NestJS.
 
 ```bash
 #Clone os projetos
-git clone --recurse-submodules --remote-submodules git@github.com:BOThiago/short-link-api.git
+git clone --recurse-submodules --remote-submodules https://github.com/BOThiago/short-link-api.git
 ```
 
 ```bash
